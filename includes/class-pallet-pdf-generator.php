@@ -209,363 +209,168 @@ private function generate_dompdf($html, $pdf_filepath) {
         }
     }
     
-    private function generate_invoice_html($pallet_data, $total_amount, $monthly_price, $months_due, $billing_result = null) {
-        // Get settings from main database
-        global $wpdb;
-        $settings_table = $wpdb->prefix . 'storage_settings';
-        
-        $company_name = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_name')) ?: 'Self Storage Cyprus';
-        $company_address = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_address')) ?: '';
-        $company_phone = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_phone')) ?: '';
-        $company_email = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_email')) ?: get_option('admin_email');
-        $company_logo = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_logo')) ?: '';
-        $currency = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'currency')) ?: 'EUR';
-        $currency_symbol = $currency === 'USD' ? '$' : ($currency === 'GBP' ? '£' : '€');
-        
-        // VAT settings (read from storage_settings)
-$vat_enabled_raw = $wpdb->get_var(
-    $wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'vat_enabled')
-);
-$vat_enabled = ($vat_enabled_raw === '1');
-
-$vat_rate = (float) ($wpdb->get_var(
-    $wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'vat_rate')
-) ?: 0);
-
-$company_vat = (string) ($wpdb->get_var(
-    $wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", 'company_vat')
-) ?: '');
-
-// totals
-$subtotal    = (float) $total_amount;                           // ex VAT
-$vat_amount  = $vat_enabled ? round($subtotal * ($vat_rate/100), 2) : 0.00;
-$grand_total = round($subtotal + $vat_amount, 2);
-
-        
-        // Get pallet dimensions
-        $pallet_dimensions = $this->get_pallet_dimensions($pallet_data['pallet_type']);
-        
-        $html = '
-        <style>
-            body { 
-                font-family: Arial, sans-serif; 
-                color: #333; 
-                font-size: 12px;
-                line-height: 1.4;
-            }
-            
-            .header-table {
-                width: 100%;
-                margin-bottom: 30px;
-                border-collapse: collapse;
-            }
-            
-            .header-table td {
-                vertical-align: top;
-                padding: 10px;
-            }
-            
-            .company-name {
-                font-size: 24px;
-                font-weight: bold;
-                color: #2563eb;
-                margin-bottom: 10px;
-            }
-            
-            .company-details {
-                color: #6b7280;
-                font-size: 11px;
-            }
-            
-            .invoice-title {
-                font-size: 22px;
-                font-weight: bold;
-                color: #1a1a1a;
-                text-align: right;
-                margin-bottom: 25px;
-            }
-            
-            .invoice-meta {
-                background-color: #f8fafc;
-                padding: 15px;
-                border-left: 4px solid #2563eb;
-                margin-bottom: 20px;
-                font-size: 11px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-                font-weight: bold;
-                color: #1a1a1a;
-                text-transform: uppercase;
-                margin-bottom: 5px;
-                border-bottom: 2px solid #e5e7eb;
-                padding-bottom: 5px;
-            }
-            
-            .customer-info {
-                background-color: #f8fafc;
-                padding: 20px;
-                border: 1px solid #e5e7eb;
-                margin-bottom: 30px;
-            }
-            
-            .customer-name {
-                font-size: 18px;
-                font-weight: bold;
-                color: #1a1a1a;
-                margin-bottom: 10px;
-            }
-            
-            .pallet-details-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 30px;
-                border: 1px solid #e5e7eb;
-                vertical-align:middle;
-            }
-            
-            .pallet-header {
-                background-color: #f97316;
-                color: white;
-                padding: 20px;
-                text-align: center;
-                font-size: 18px;
-                font-weight: bold;
-            }
-            
-            .pallet-spec-cell {
-                background-color: #f97316;
-                color: white;
-                padding: 15px;
-                text-align: center;
-                width: 20%;
-                vertical-align: top;
-            }
-            
-            .pallet-spec-label {
-                font-size: 10px;
-                text-transform: uppercase;
-                opacity: 0.8;
-                margin-bottom: 8px;
-            }
-            
-            .pallet-spec-value {
-                font-size: 13px;
-                font-weight: bold;
-                margin: 0;
-            }
-            
-            .billing-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 30px;
-                border: 1px solid #e5e7eb;
-            }
-            
-            .billing-table th {
-                background-color: #1e293b;
-                color: white;
-                padding: 15px;
-                text-align: left;
-                font-weight: bold;
-                font-size: 12px;
-                text-transform: uppercase;
-            }
-            
-            .billing-table td {
-                padding: 15px;
-                border-bottom: 1px solid #f1f5f9;
-            }
-            
-            .month-label {
-                font-weight: bold;
-                color: #1a1a1a;
-            }
-            
-            .days-info {
-                color: #6b7280;
-                font-size: 11px;
-            }
-            
-            .amount-cell {
-                text-align: right;
-                font-weight: bold;
-            }
-            
-            .total-section {
-                background-color: #10b981;
-                color: white;
-                padding: 25px;
-                text-align: center;
-                margin-bottom: 30px;
-            }
-            
-            .total-label {
-                font-size: 14px;
-                text-transform: uppercase;
-                margin-bottom: 10px;
-            }
-            
-            .total-amount {
-                font-size: 36px;
-                font-weight: bold;
-            }
-            
-            .payment-terms {
-                background-color: #fef3c7;
-                border: 1px solid #f59e0b;
-                padding: 15px;
-                margin-bottom: 25px;
-            }
-            
-            .payment-terms-title {
-                font-weight: bold;
-                color: #92400e;
-                margin-bottom: 8px;
-            }
-            
-            .payment-terms-text {
-                color: #78350f;
-                font-size: 11px;
-            }
-            
-            .invoice-footer {
-                text-align: center;
-                border-top: 2px solid #f1f5f9;
-                padding-top: 20px;
-                color: #6b7280;
-                font-size: 11px;
-            }
-            
-            .footer-highlight {
-                color: #2563eb;
-                font-weight: bold;
-            }
-        </style>
-        
-        <!-- Header Section -->
-        <table class="header-table">
-            <tr>
-                <td width="50%">
-                    ' . ($company_logo ? '<img src="' . $company_logo . '" style="max-height: 50px; margin-bottom: 10px;"><br>' : '') . '
-                    <div class="company-name">' . esc_html($company_name) . '</div>
-                    <div class="company-details">
-                        ' . nl2br(esc_html($company_address)) . '<br>
-                        ' . ($company_phone ? 'Phone: ' . esc_html($company_phone) . '<br>' : '') . '
-                        Email: ' . esc_html($company_email) . '<br> VAT / Tax ID: ' . esc_html($company_vat)  .'
-                    </div>
-                </td>
-                <td width="50%" style="text-align: right;">
-                    <div class="invoice-title">PALLET INVOICE</div>
-                    <div class="invoice-meta">
-                        <strong>Invoice #:</strong> PAL-' . $pallet_data['id'] . '-' . date('Ymd') . '<br>
-                        <strong>Date:</strong> ' . date('M d, Y') . '<br>
-                        <strong>Due Date:</strong> ' . date('M d, Y', strtotime('+30 days')) . '
-                    </div>
-                </td>
-            </tr>
-        </table>
-        
-        <!-- Bill To Section -->
-        <div class="section-title">Bill To</div>
-        <div class="customer-info">
-            <div class="customer-name">' . esc_html($pallet_data['primary_contact_name'] ?: 'N/A') . '</div>
-            <div>Phone: ' . esc_html($pallet_data['primary_contact_phone'] ?: 'N/A') . '</div>
-            <div>Email: ' .  esc_html($pallet_data['primary_contact_email'] ?: 'N/A') . '</div>
-        </div>
-        
-        <!-- Pallet Details Section -->
-        <div class="section-title">Pallet Storage Details</div>
-        <table class="pallet-details-table">
-            <tr>
-                <td colspan="5" class="pallet-header">
-                    Pallet ' . esc_html($pallet_data['pallet_name']) . '
-                </td>
-            </tr>
-            <tr>
-                <td class="pallet-spec-cell">
-                    <div class="pallet-spec-label">TYPE</div>
-                    <div class="pallet-spec-value">' . esc_html($pallet_data['pallet_type']) . ' Pallet</div>
-                </td>
-                <td class="pallet-spec-cell">
-                    <div class="pallet-spec-label">DIMENSIONS</div>
-                    <div class="pallet-spec-value">' . esc_html($pallet_dimensions) . '</div>
-                </td>
-                <td class="pallet-spec-cell">
-                    <div class="pallet-spec-label">HEIGHT</div>
-                    <div class="pallet-spec-value">' . esc_html($pallet_data['actual_height']) . 'm<br><small>(Charged: ' . esc_html($pallet_data['charged_height']) . 'm)</small></div>
-                </td>
-                <td class="pallet-spec-cell">
-                    <div class="pallet-spec-label">VOLUME</div>
-                    <div class="pallet-spec-value">' . number_format($pallet_data['cubic_meters'], 2) . ' m³</div>
-                </td>
-                <td class="pallet-spec-cell">
-                    <div class="pallet-spec-label">MONTHLY RATE</div>
-                    <div class="pallet-spec-value">' . $currency_symbol . number_format($monthly_price, 2) . '</div>
-                </td>
-            </tr>
-        </table>
-        
-        <!-- Period -->
-        <div class="section-title">Storage Period</div>
-        <div style="background-color: #f97316; color: white; padding: 15px; margin-bottom: 30px; text-align: center; font-weight: bold;">
-            ' . esc_html($pallet_data['period_from'] ?: 'N/A') . ' to ' . esc_html($pallet_data['period_until'] ?: 'N/A') . '
-        </div>
-        
-        <!-- Billing Breakdown -->
-        <div class="section-title">Billing Details</div>
-        <table class="billing-table">
-            <thead>
-                <tr>
-                    <th>Period</th>
-                    <th>Days</th>
-                    <th>Rate</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                ' . ($billing_result ? $this->generate_billing_breakdown($billing_result, $monthly_price, $currency_symbol) : $this->generate_simple_billing_row($pallet_data, $months_due, $monthly_price, $currency_symbol)) . '
-            </tbody>
-        </table>
-        
-        <!-- Total Section -->
-        <div class="total-section">
-        <div class="section-title">Totals</div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-  <tr>
-    <td style="padding:8px;border:1px solid #e5e7eb;">Subtotal (ex VAT)</td>
-    <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;"><strong>' . $currency_symbol . number_format($subtotal,2) . ' </strong></td>
-  </tr>
-  <tr>
-    <td style="padding:8px;border:1px solid #e5e7eb;">VAT ( '. number_format($vat_rate,2) . ' % )</td>
-    <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;"><strong> ' . $currency_symbol . number_format($vat_amount,2) .'</strong></td>
-</tr>
-  <tr>
-    <td style="padding:12px;border:1px solid #e5e7eb;"><strong>Total (incl. VAT) </strong></td>
-    <td style="padding:12px;border:1px solid #e5e7eb;text-align:right;"><strong>' . $currency_symbol . number_format($grand_total,2) .' 
-            </strong></td>
-  </tr>
-</table>
-        </div>
-        
-        <!-- Payment Terms -->
-        <div class="payment-terms">
-            <div class="payment-terms-title">Payment Terms</div>
-            <div class="payment-terms-text">
-                Payment is due within 30 days of invoice date. Late payments may result in service interruption and additional fees.
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="invoice-footer">
-            <p>Thank you for choosing <span class="footer-highlight">' . esc_html($company_name) . '</span> Pallet Storage</p>
-            <p>For questions about this invoice, please contact us at ' . esc_html($company_email) . '</p>
-        </div>';
-        
-        return $html;
-    }
+private function generate_invoice_html($pallet_data, $total_amount, $monthly_price, $months_due, $billing_result = null) {
+    // Get settings from main database (using the global $wpdb context from the original file)
+    global $wpdb;
+    $settings_table = $wpdb->prefix . 'storage_settings';
     
+    $get_setting = function($key, $default = '') use ($wpdb, $settings_table) {
+        $value = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $settings_table WHERE setting_key = %s", $key));
+        return $value !== null ? $value : $default;
+    };
+
+    $company_logo = $get_setting('company_logo', '');
+    $company_name = $get_setting('company_name', 'Self Storage Cyprus');
+    $company_address = $get_setting('company_address', '');
+    $company_phone = $get_setting('company_phone', '');
+    $company_email = $get_setting('company_email', get_option('admin_email'));
+    
+    // VAT & Currency settings
+    $vat_enabled = ($get_setting('vat_enabled', '0') === '1');
+    $vat_rate = (float) $get_setting('vat_rate', '0');
+    $company_vat = (string) $get_setting('company_vat', '');
+    $currency = $get_setting('currency', 'EUR');
+    $currency_symbol = $currency === 'USD' ? '$' : ($currency === 'GBP' ? '£' : '€');
+    
+    // Totals Calculation
+    $subtotal    = (float) $total_amount;                           
+    $vat_amount  = $vat_enabled ? round($subtotal * ($vat_rate/100), 2) : 0.00;
+    $grand_total = round($subtotal + $vat_amount, 2);
+
+    // Pallet dimensions helper (re-using your original helper method)
+    $pallet_dimensions = $this->get_pallet_dimensions($pallet_data['pallet_type']);
+
+    // --- Minimalist Design Variables (Orange Accent) ---
+    $accent_color = '#f97316'; // Orange for Pallets
+    $light_bg = '#fff7ed';
+    $border_color = '#e5e7eb';
+    
+    $html = '
+    <style>
+        /* MINIMALIST PALLET STYLES */
+        body { font-family: Arial, sans-serif; color: #333; font-size: 11px; line-height: 1.4; }
+        .accent-color { color: ' . $accent_color . '; }
+        .bg-accent { background-color: ' . $accent_color . '; color: white; }
+        .bg-light { background-color: ' . $light_bg . '; }
+        
+        .header-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+        .header-table td { vertical-align: top; padding: 0; }
+        
+        .invoice-title { font-size: 28px; font-weight: bold; text-align: right; margin-bottom: 15px; }
+        .invoice-meta { background-color: ' . $light_bg . '; padding: 10px; border-left: 4px solid ' . $accent_color . '; margin-top: 10px; font-size: 10px; }
+        
+        .section-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid ' . $border_color . '; }
+        .customer-info { margin-bottom: 20px; padding: 10px 0; font-size: 12px; }
+        .customer-name { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+
+        /* Pallet Details Bar */
+        .pallet-details-bar { background-color: ' . $accent_color . '; color: white; padding: 15px; margin-bottom: 20px; }
+        .pallet-name { font-size: 18px; font-weight: bold; margin: 0; }
+        .pallet-specs { font-size: 11px; margin-top: 5px; }
+        
+        /* Billing Table */
+        .billing-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .billing-table th { background-color: #f1f5f9; color: #333; padding: 10px; text-align: left; font-size: 11px; border-bottom: 1px solid ' . $border_color . '; }
+        .billing-table td { padding: 10px; border-bottom: 1px dashed #eee; font-size: 11px; }
+        .amount-cell { text-align: right; font-weight: bold; }
+        
+        /* Totals Block (Cleaned up) */
+        .totals-block { width: 40%; float: right; margin-top: 10px; }
+        .totals-table { width: 100%; border-collapse: collapse; text-align: right; }
+        .totals-table td { padding: 5px 0; font-size: 11px; }
+        .totals-table .total-row td { 
+            border-top: 2px solid ' . $accent_color . '; 
+            font-size: 14px; 
+            font-weight: bold;
+            padding-top: 8px; 
+        }
+        
+        .invoice-footer { text-align: center; border-top: 1px solid ' . $border_color . '; padding-top: 15px; color: #6b7280; font-size: 10px; margin-top: 60px; }
+    </style>
+    
+    <table class="header-table">
+        <tr>
+            <td width="50%">
+            ' . ($company_logo ? '<img src="' . $company_logo . '" style="max-height: 50px; margin-bottom: 10px;"><br>' : '') . '
+                <div >' . esc_html($company_name) . '</div>
+                <div style="font-size: 10px; color: #6b7280;">
+                    ' . nl2br(esc_html($company_address)) . '<br>
+                    ' . ($company_phone ? 'Phone: ' . esc_html($company_phone) . '<br>' : '') . '
+                    Email: ' . esc_html($company_email) . '<br> VAT / Tax ID: ' . esc_html($company_vat)  .'
+                </div>
+            </td>
+            <td width="50%" style="text-align: right;">
+                <div class="invoice-title accent-color">PALLET INVOICE</div>
+                <div class="invoice-meta">
+                    <strong>Invoice #:</strong> PAL-' . $pallet_data['id'] . '-' . date('Ymd') . '<br>
+                    <strong>Date:</strong> ' . date('M d, Y') . '<br>
+                    <strong>Due:</strong> ' . date('M d, Y', strtotime('+30 days')) . '
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <div class="section-title">Bill To</div>
+    <div class="customer-info">
+        <div class="customer-name">' . esc_html($pallet_data['primary_contact_name'] ?: 'N/A') . '</div>
+        <div>Phone: ' . esc_html($pallet_data['primary_contact_phone'] ?: 'N/A') . '</div>
+        <div>Email: ' .  esc_html($pallet_data['primary_contact_email'] ?: 'N/A') . '</div>
+    </div>
+    
+    <div class="pallet-details-bar bg-accent">
+        <div class="pallet-name">PALLET ' . esc_html($pallet_data['pallet_name']) . '</div>
+        <div class="pallet-specs">
+            Type: ' . esc_html($pallet_data['pallet_type']) . ' | 
+            Dimensions: ' . esc_html($pallet_dimensions) . ' |
+            Height: ' . esc_html($pallet_data['charged_height']) . 'm |
+            Monthly Rate: ' . $currency_symbol . number_format($monthly_price, 2) . '
+        </div>
+    </div>
+    
+    <div class="section-title">Billing Details</div>
+    <table class="billing-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Description / Period</th>
+                <th style="width: 15%; text-align: center;">Qty (Months)</th>
+                <th style="width: 15%; text-align: right;">Rate</th>
+                <th style="width: 20%; text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            ' . ($billing_result ? $this->generate_billing_breakdown($billing_result, $monthly_price, $currency_symbol) : $this->generate_simple_billing_row($pallet_data, $months_due, $monthly_price, $currency_symbol)) . '
+        </tbody>
+    </table>
+    
+    <div class="totals-block">
+        <table class="totals-table">
+            <tr>
+                <td>Subtotal (ex VAT):</td>
+                <td><strong>' . $currency_symbol . number_format($subtotal, 2) . ' </strong></td>
+            </tr>
+            ' . ($vat_enabled ? '
+            <tr>
+                <td>VAT (' . number_format($vat_rate, 2) . ' %):</td>
+                <td><strong> ' . $currency_symbol . number_format($vat_amount, 2) . '</strong></td>
+            </tr>' : '') . '
+            <tr class="total-row">
+                <td>TOTAL DUE:</td>
+                <td>' . $currency_symbol .' ' . number_format($grand_total, 2) . ' 
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="clear: both;"></div>
+    
+    <div class="invoice-footer">
+        <p>VAT / Tax ID: ' . esc_html($company_vat) . '</p>
+        <p>Thank you for choosing <span class="accent-color" style="color: ' . $accent_color . ';">' . esc_html($company_name) . '</span> Pallet Storage. Payment is due within 30 days of invoice date.</p>
+    </div>';
+    
+    return $html;
+}    
+
     private function get_pallet_dimensions($pallet_type) {
         if ($pallet_type === 'US') {
             return '1.22m × 1.02m';
