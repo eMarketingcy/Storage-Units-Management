@@ -192,6 +192,9 @@ private function generate_with_dompdf($html, $filepath) {
         if ($bytes === false || $bytes === 0) {
             throw new \Exception('Failed to write PDF file to disk: ' . $filepath);
         }
+        
+        return true;
+        
     } catch (\Throwable $e) {
         throw new \Exception('DomPDF generation failed: ' . $e->getMessage());
     }
@@ -228,6 +231,8 @@ private function generate_with_dompdf($html, $filepath) {
             if (!$result) {
                 throw new Exception('TCPDF failed to save file to: ' . $filepath);
             }
+            
+            return true;
             
         } catch (Exception $e) {
             throw new Exception('TCPDF generation failed: ' . $e->getMessage());
