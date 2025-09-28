@@ -1,0 +1,875 @@
+/* Customers Frontend Styles */
+
+/* CSS Variables for Consistent Theming */
+:root {
+    --frontend-primary: #f97316;
+    --frontend-primary-dark: #ea580c;
+    --frontend-primary-light: #fed7aa;
+    --frontend-secondary: #64748b;
+    --frontend-success: #10b981;
+    --frontend-warning: #f59e0b;
+    --frontend-danger: #ef4444;
+    --pallet-background: #f8fafc;
+    --frontend-background: #f8fafc;
+    --frontend-surface: #ffffff;
+    --frontend-text: #1e293b;
+    --frontend-text-muted: #64748b;
+    --frontend-border: #e2e8f0;
+    --frontend-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --frontend-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --frontend-radius: 12px;
+    --frontend-radius-lg: 16px;
+    --frontend-spacing: 1rem;
+    --frontend-spacing-lg: 1.5rem;
+    --frontend-spacing-xl: 2rem;
+    --pallet-primary: #f97316;
+    --pallet-primary-dark: #ea580c;
+}
+
+.sum-frontend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sum-frontend-header h2 {
+    margin: 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sum-frontend-search {
+    display: flex;
+    gap: 10px;
+}
+
+.sum-frontend-search input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+}
+
+.sum-frontend-filters {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn.active {
+    background: #0073aa;
+    color: white;
+    border-color: #0073aa;
+}
+
+.sum-customers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding-bottom:120px;
+}
+
+.sum-customer-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #0073aa;
+    transition: all 0.3s;
+}
+
+.sum-customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.sum-customer-card.past-customer {
+    border-left-color: #856404;
+    opacity: 0.9;
+}
+
+.sum-customer-card.unpaid-customer {
+    border-left-color: #dc3545;
+}
+
+.sum-customer-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.sum-customer-contact {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.sum-customer-rentals h4 {
+    font-size: 14px;
+    margin: 10px 0 5px 0;
+    color: #555;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.sum-rental-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.sum-rental-tag {
+    background: #f1f1f1;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sum-rental-tag.current {
+    background: #d4edda;
+    color: #155724;
+}
+
+.sum-rental-tag.past {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.sum-rental-tag.unpaid {
+    background: #dc3545;
+    color: white;
+}
+
+.sum-login-required {
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #666;
+}
+
+.sum-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.sum-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sum-empty-icon {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.sum-unpaid-indicator {
+    background: #dc3545;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.sum-customer-status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sum-status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sum-status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.sum-status-past {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.sum-status-unpaid {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.sum-customer-status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sum-status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sum-status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.sum-status-past {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.sum-status-unpaid {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Navigation */
+.sum-frontend-navigation {
+    display: flex;
+    gap: var(--frontend-spacing);
+    margin-bottom: var(--frontend-spacing-xl);
+}
+
+.sum-frontend-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--frontend-surface);
+    border: 2px solid var(--frontend-border);
+    border-radius: var(--frontend-radius);
+    text-decoration: none;
+    color: var(--frontend-text-muted);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: var(--frontend-shadow);
+}
+
+.sum-frontend-nav-item:hover {
+    border-color: var(--frontend-primary);
+    color: var(--frontend-primary);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.sum-frontend-nav-active {
+    background: var(--frontend-primary);
+    border-color: var(--frontend-primary);
+    color: white;
+}
+
+.sum-frontend-nav-active:hover {
+    color: white;
+}
+
+.sum-frontend-nav-icon {
+    font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .sum-frontend-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .sum-customers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sum-frontend-filters {
+        flex-wrap: wrap;
+    }
+    
+    .sum-frontend-search input {
+        width: 200px;
+    }
+}
+
+/* ==========================================================================
+   Frontend Base Styles (Shared with Units/Pallets)
+   ========================================================================== */
+
+#sum-customers-frontend {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.sum-login-required {
+    background-color: #ffe0e0;
+    border: 1px solid #ffaaaa;
+    padding: 15px;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 1.1em;
+    color: #cc0000;
+    margin-bottom: 20px;
+}
+
+.sum-frontend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.sum-frontend-header h2 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: #333;
+}
+
+.sum-frontend-search {
+    display: flex;
+    gap: 10px;
+}
+
+#frontend-search {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+    box-sizing: border-box;
+}
+
+/* --- Navigation & Filters (Design Integration) --- */
+
+.sum-frontend-navigation {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.sum-frontend-nav-item {
+    text-decoration: none;
+    padding: 12px 20px;
+    color: #666;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sum-frontend-nav-active {
+    border-bottom-color: #0073aa; /* WordPress Blue */
+    color: #0073aa;
+    font-weight: 600;
+}
+
+.sum-frontend-nav-item:hover {
+    color: #0099cc;
+    border-bottom-color: #a0a0a0;
+}
+
+.sum-frontend-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #555;
+    font-weight: 500;
+}
+
+.filter-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.filter-btn.active {
+    background-color: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+/* --- View Toggle Buttons --- */
+.sum-view-options {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.sum-view-toggle-btn {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.sum-view-toggle-btn.active {
+    background-color: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+/* --- Status & Rental Badges (Utility Classes) --- */
+
+.sum-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.sum-status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sum-status-past {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.sum-rental-item {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin: 2px 4px 2px 0;
+    font-weight: 500;
+}
+
+.sum-rental-unit {
+    background-color: #e6f7ff;
+    color: #0050b3;
+}
+
+.sum-rental-pallet {
+    background-color: #f9f0ff;
+    color: #722ed1;
+}
+
+/* --- Loading & Empty State --- */
+.sum-loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.1em;
+    color: #666;
+}
+
+.sum-empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   Grid/Card View Specific Styles
+   ========================================================================== */
+
+.sum-customers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.sum-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.sum-card:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sum-card-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sum-customer-name {
+    margin: 0;
+    font-size: 1.3em;
+    color: #333;
+}
+
+.sum-card-body {
+    padding: 15px;
+}
+
+.sum-contact {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.sum-rentals-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.sum-rentals-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    font-weight: 600;
+    color: #444;
+}
+
+.sum-card-footer {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.sum-card-action-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.sum-card-action-btn:hover {
+    background-color: #005a87;
+}
+
+
+/* ==========================================================================
+   List View Specific Styles
+   ========================================================================== */
+
+.sum-customers-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.sum-list-header,
+.sum-list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.sum-list-header {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #444;
+}
+
+.sum-list-item:hover {
+    background-color: #f9f9f9;
+}
+
+.sum-list-item:last-child {
+    border-bottom: none;
+}
+
+.sum-list-column {
+    /* Base for equal distribution - adjust weights below */
+    flex-grow: 1; 
+    padding: 0 10px;
+    min-height: 1px; /* To prevent collapse on minimal content */
+}
+
+/* Column Width Distribution for List View */
+.sum-column-name    { flex: 2; }
+.sum-column-contact { flex: 3; }
+.sum-column-rentals { flex: 2; }
+.sum-column-status  { flex: 1.5; }
+.sum-column-actions { flex: 1; text-align: right; }
+
+.sum-list-item .sum-contact {
+    margin: 0;
+    font-size: 0.9em;
+}
+
+/* Ensure action button in list view is styled consistently */
+.sum-list-item .sum-card-action-btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .sum-frontend-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sum-frontend-search {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    #frontend-search {
+        width: 100%;
+    }
+    
+    .sum-customers-list {
+        border-radius: 0;
+    }
+
+    /* List view fallback to vertical stacking for readability on mobile */
+    .sum-customers-list .sum-list-header {
+        display: none; /* Hide header on mobile list view */
+    }
+    
+    .sum-customers-list .sum-list-item {
+        flex-wrap: wrap;
+        border-bottom: 5px solid #f0f0f0;
+        margin-bottom: 5px;
+        align-items: flex-start;
+    }
+
+    .sum-customers-list .sum-list-column {
+        flex: 100%; /* Full width stack */
+        padding: 5px 0;
+    }
+
+    .sum-list-item .sum-column-actions {
+        text-align: left;
+    }
+}
+
+/* ==========================================================================
+   Modal/Dialog Styles (View Details)
+   ========================================================================== */
+
+.sum-modal-overlay {
+    /* Full screen backdrop */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent overlay */
+    z-index: 10000; /* Ensure it's on top of all other content */
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto; /* Allow scrolling if content is too tall */
+}
+
+.sum-modal-overlay.active {
+    display: flex; /* Show when active */
+}
+
+.sum-modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 650px; /* Max width for details modal */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin: 40px auto;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+.sum-modal-overlay.active .sum-modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.sum-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sum-modal-header h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.sum-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.sum-modal-close:hover {
+    color: #333;
+}
+
+.sum-modal-body {
+    padding: 20px;
+    max-height: 70vh; /* Control max height for scrollable content */
+    overflow-y: auto;
+}
+
+.sum-loading-modal {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.1em;
+    color: #666;
+}
+
+.sum-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+/* --- Modal Content Styles --- */
+
+.sum-detail-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+}
+
+.sum-detail-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.sum-detail-section h4 {
+    font-size: 1.1em;
+    color: #0073aa;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #f0f8ff;
+}
+
+.sum-detail-section p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.sum-rental-history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sum-rental-history-list li {
+    padding: 5px 0;
+    border-bottom: 1px dotted #f0f0f0;
+    font-size: 0.9em;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 600px) {
+    .sum-modal-content {
+        width: 95%;
+        margin: 20px auto;
+    }
+}
+
+
+/* --- Modal Unpaid Invoice Styles --- */
+.sum-unpaid-invoices-section {
+    padding: 15px;
+    border: 1px solid #f9c3c3;
+    background-color: #fff0f0;
+    border-radius: 4px;
+    margin: 15px 0;
+}
+
+.sum-unpaid-invoices-section h4 {
+    color: #cc0000;
+    font-size: 1.1em;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 10px;
+}
+
+.sum-unpaid-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.sum-unpaid-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px dotted #ffaaaa;
+    font-size: 0.9em;
+}
+
+.sum-unpaid-item:last-child {
+    border-bottom: none;
+}
+
+.sum-unpaid-amount {
+    font-weight: 600;
+    color: #cc0000;
+}
+
+/* Invoice generation button status message */
+.sum-invoice-status-message {
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+.sum-invoice-status-message .dashicons {
+    margin-right: 5px;
+    /* Ensure spinning dashicons work correctly */
+    display: inline-block;
+    vertical-align: middle;
+}
